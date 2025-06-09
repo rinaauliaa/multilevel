@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplikasi Manajemen Pengguna</title>
+  <script>
+    // Theme Switcher untuk Aplikasi Manajemen Pengguna
+document.addEventListener('DOMContentLoaded', function() {
+  // Tambahkan elemen untuk pemilihan tema di header
+  const header = document.querySelector('header');
+  const themeContainer = document.createElement('div');
+  themeContainer.className = 'theme-container';
+  themeContainer.innerHTML = `
+    <p class="theme-title">Pilih Tema:</p>
+    <div class="theme-options">
+      <button class="theme-btn default active" data-theme="default">Default</button>
+      <button class="theme-btn dark" data-theme="dark">Dark</button>
+      <button class="theme-btn colorful" data-theme="colorful">Colorful</button>
+      <button class="theme-btn minimal" data-theme="minimal">Minimal</button>
+    </div>
+  `;
+  header.appendChild(themeContainer);
+
+  // Buat style untuk tema selector
+  const themeSelectStyle = document.createElement('style');
+  themeSelectStyle.textContent = `
+    .theme-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+    
+    .theme-title {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .theme-options {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .theme-btn {
+      padding: 8px 15px;
+      border-radius: var(--border-radius);
+      font-size: 0.8rem;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .theme-btn.active {
+      border-color: #333;
+      font-weight: 600;
+    }
+    
+    .theme-btn.default {
+      background-color: #3498db;
+      color: white;
+    }
+    
+    .theme-btn.dark {
+      background-color: #2c3e50;
+      color: white;
+    }
+    
+    .theme-btn.colorful {
+      background: linear-gradient(135deg, #9b59b6, #3498db);
+      color: white;
+    }
+    
+    .theme-btn.minimal {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+  `;
+  document.head.appendChild(themeSelectStyle);
+
+  // Definisikan tema-tema
+  const themes = {
+    default: {
+      '--primary-color': '#3498db',
+      '--secondary-color': '#2980b9',
+      '--danger-color': '#e74c3c',
+      '--success-color': '#2ecc71',
+      '--text-color': '#333',
+      '--background-color': '#f7f9fc',
+      '--card-color': '#ffffff',
+      '--shadow': '0 4px 6px rgba(0, 0, 0, 0.1)',
+      '--border-radius': '8px'
+    },
+    dark: {
+      '--primary-color': '#8e44ad',
+      '--secondary-color': '#7d3c98',
+      '--danger-color': '#c0392b',
+      '--success-color': '#27ae60',
+      '--text-color': '#f5f5f5',
+      '--background-color': '#2c3e50',
+      '--card-color': '#34495e',
+      '--shadow': '0 4px 10px rgba(0, 0, 0, 0.3)',
+      '--border-radius': '8px'
+    },
+    colorful: {
+      '--primary-color': '#ff7675',
+      '--secondary-color': '#e17055',
+      '--danger-color': '#d63031',
+      '--success-color': '#00b894',
+      '--text-color': '#2d3436',
+      '--background-color': '#dfe6e9',
+      '--card-color': '#ffffff',
+      '--shadow': '0 6px 12px rgba(0, 0, 0, 0.1)',
+      '--border-radius': '15px'
+    },
+    minimal: {
+      '--primary-color': '#34495e',
+      '--secondary-color': '#2c3e50',
+      '--danger-color': '#c0392b',
+      '--success-color': '#16a085',
+      '--text-color': '#333',
+      '--background-color': '#ffffff',
+      '--card-color': '#fafafa',
+      '--shadow': '0 2px 4px rgba(0, 0, 0, 0.05)',
+      '--border-radius': '4px'
+    }
+  };
+
+  // Tambahan CSS untuk tema dark
+  const darkThemeExtraStyles = `
+    .dark-theme body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+    }
+    
+    .dark-theme .container {
+      background-color: var(--card-color);
+    }
+    
+    .dark-theme .user-item {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-left-color: var(--primary-color);
+    }
+    
+    .dark-theme input {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text-color);
+    }
+    
+    .dark-theme .file-input-label {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--text-color);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .dark-theme .btn-cancel {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--text-color);
+    }
+    
+    .dark-theme .empty-state,
+    .dark-theme .loading {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .dark-theme .modal-content {
+      background-color: var(--card-color);
+      color: var(--text-color);
+    }
+  `;
+
+  // Tambahan CSS untuk tema colorful
+  const colorfulThemeExtraStyles = `
+    .colorful-theme .user-item {
+      border-left: 4px solid transparent;
+      border-image: linear-gradient(to bottom, var(--primary-color), var(--success-color));
+      border-image-slice: 1;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 1));
+    }
+    
+    .colorful-theme .btn-add {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    }
+    
+    .colorful-theme .user-photo {
+      border: 3px solid transparent;
+      background: linear-gradient(white, white) padding-box,
+                  linear-gradient(45deg, var(--primary-color), var(--success-color)) border-box;
+    }
+    
+    .colorful-theme h1 {
+      background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+  `;
+
+  // Tambahan CSS untuk tema minimal
+  const minimalThemeExtraStyles = `
+    .minimal-theme .container {
+      box-shadow: none;
+      border: 1px solid #eee;
+    }
+    
+    .minimal-theme .user-item {
+      box-shadow: none;
+      border: 1px solid #eee;
+      border-left: 3px solid var(--primary-color);
+      border-radius: 0;
+    }
+    
+    .minimal-theme .btn-add,
+    .minimal-theme .btn-edit,
+    .minimal-theme .btn-delete,
+    .minimal-theme .btn-save,
+    .minimal-theme .btn-cancel {
+      border-radius: 0;
+      font-weight: normal;
+    }
+    
+    .minimal-theme .user-photo {
+      border-radius: 0;
+    }
+    
+    .minimal-theme input,
+    .minimal-theme .file-input-label {
+      border-radius: 0;
+    }
+    
+    .minimal-theme .photo-preview {
+      border-radius: 0;
+    }
+    
+    .minimal-theme .modal-content {
+      border-radius: 0;
+    }
+  `;
+
+  // Buat elemen style untuk tema tambahan
+  const extraStylesElement = document.createElement('style');
+  extraStylesElement.textContent = `
+    ${darkThemeExtraStyles}
+    ${colorfulThemeExtraStyles}
+    ${minimalThemeExtraStyles}
+  `;
+  document.head.appendChild(extraStylesElement);
+
+  // Fungsi untuk mengaplikasikan tema
+  function applyTheme(themeName) {
+    // Reset tema classes
+    document.body.classList.remove('dark-theme', 'colorful-theme', 'minimal-theme');
+    
+    // Tambahkan class tema yang aktif
+    if (themeName !== 'default') {
+      document.body.classList.add(`${themeName}-theme`);
+    }
+    
+    // Set variabel CSS
+    const theme = themes[themeName];
+    Object.keys(theme).forEach(key => {
+      document.documentElement.style.setProperty(key, theme[key]);
+    });
+    
+    // Simpan preferensi tema pengguna di localStorage
+    localStorage.setItem('userTheme', themeName);
+    
+    // Update tombol aktif
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document.querySelector(`.theme-btn[data-theme="${themeName}"]`).classList.add('active');
+    
+    // Tampilkan pesan
+    showToast(`Tema ${themeName} diterapkan`);
+  }
+
+  // Tambahkan event listener ke tombol tema
+  document.querySelectorAll('.theme-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const themeName = this.getAttribute('data-theme');
+      applyTheme(themeName);
+    });
+  });
+
+  // Cek preferensi tema yg tersimpan
+  const savedTheme = localStorage.getItem('userTheme');
+  if (savedTheme) {
+    applyTheme(savedTheme);
+  }
+
+  // Tambahkan animasi pada item user
+  const userItemAnimations = document.createElement('style');
+  userItemAnimations.textContent = `
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .user-item {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+    
+    .user-item:nth-child(1) { animation-delay: 0.05s; }
+    .user-item:nth-child(2) { animation-delay: 0.1s; }
+    .user-item:nth-child(3) { animation-delay: 0.15s; }
+    .user-item:nth-child(4) { animation-delay: 0.2s; }
+    .user-item:nth-child(5) { animation-delay: 0.25s; }
+    
+    .toast {
+      animation: slideIn 0.3s ease-out forwards;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  `;
+  document.head.appendChild(userItemAnimations);
+
+  // Tambahkan fitur animasi saat hover pada tombol
+  const buttonAnimations = document.createElement('style');
+  buttonAnimations.textContent = `
+    .btn-add, .btn-edit, .btn-delete, .btn-save, .btn-cancel {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-add:after, .btn-edit:after, .btn-delete:after, .btn-save:after, .btn-cancel:after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.5);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%);
+      transform-origin: 50% 50%;
+    }
+    
+    .btn-add:focus:not(:active)::after,
+    .btn-edit:focus:not(:active)::after,
+    .btn-delete:focus:not(:active)::after,
+    .btn-save:focus:not(:active)::after,
+    .btn-cancel:focus:not(:active)::after {
+      animation: ripple 1s ease-out;
+    }
+    
+    @keyframes ripple {
+      0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+      }
+      20% {
+        transform: scale(25, 25);
+        opacity: 0.5;
+      }
+      100% {
+        opacity: 0;
+        transform: scale(40, 40);
+      }
+    }
+  `;
+  document.head.appendChild(buttonAnimations);
+
+  // Perbarui fungsi getUsers untuk menambahkan animasi saat memuat pengguna
+  const originalGetUsers = window.getUsers;
+  window.getUsers = async function() {
+    try {
+      document.getElementById('loading').style.display = 'block';
+      const res = await fetch(API_URL);
+      
+      if (!res.ok) {
+        throw new Error('Gagal memuat data');
+      }
+      
+      const users = await res.json();
+      const list = document.getElementById('userList');
+      const emptyState = document.getElementById('emptyState');
+      
+      // Tambahkan animasi fade-out pada list sebelum menghapus
+      list.style.opacity = '0';
+      list.style.transition = 'opacity 0.3s';
+      
+      setTimeout(() => {
+        list.innerHTML = '';
+        
+        if (users.length === 0) {
+          emptyState.style.display = 'block';
+        } else {
+          emptyState.style.display = 'none';
+          
+          users.forEach((user, index) => {
+            const li = document.createElement('li');
+            li.className = 'user-item';
+            li.style.animationDelay = `${index * 0.05}s`;
+            
+            const photoHTML = user.foto 
+              ? `<div class="user-photo"><img src="uploads/${user.foto}" alt="${user.nama}"></div>`
+              : `<div class="user-photo"><img src="/api/placeholder/50/50" alt="No Photo"></div>`;
+            
+            li.innerHTML = `
+              <div class="user-info">
+                ${photoHTML}
+                <span class="user-name">${user.nama}</span>
+              </div>
+              <div class="action-buttons">
+                <button class="btn-edit" onclick="showEditModal(${user.id}, '${user.nama}', '${user.foto || ''}')">Edit</button>
+                <button class="btn-delete" onclick="deleteUser(${user.id})">Hapus</button>
+              </div>
+            `;
+            list.appendChild(li);
+          });
+        }
+        
+        // Tambahkan animasi fade-in saat list sudah diperbarui
+        list.style.opacity = '1';
+      }, 300);
+      
+    } catch (error) {
+      showToast('Terjadi kesalahan: ' + error.message, true);
+    } finally {
+      document.getElementById('loading').style.display = 'none';
+    }
+  };
+
+  // Modifikasi animasi toast
+  const toastStyle = document.createElement('style');
+  toastStyle.textContent = `
+    .toast {
+      border-radius: 4px;
+      padding: 15px 25px;
+      min-width: 200px;
+      text-align: center;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease-in-out;
+    }
+  `;
+  document.head.appendChild(toastStyle);
+
+  // Tambahkan fungsi untuk efek loading custom
+  const loadingStyle = document.createElement('style');
+  loadingStyle.textContent = `
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+    
+    .loading:before {
+      content: '';
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-right: 10px;
+      border: 3px solid var(--primary-color);
+      border-top-color: transparent;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  `;
+  document.head.appendChild(loadingStyle);
+
+  // Modifikasi tampilan Loading
+  const loadingElement = document.getElementById('loading');
+  loadingElement.innerHTML = '';
+  loadingElement.textContent = 'Memuat data...';
+
+  console.log('Theme Switcher berhasil dimuat');
+});
+  </script>
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --secondary-color: #2980b9;
+      --danger-color: #e74c3c;
+      --success-color: #2ecc71;
+      --text-color: #333;
+      --background-color: #f7f9fc;
+      --card-color: #ffffff;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --border-radius: 8px;
+    }
+    
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px;
+      background-color: var(--card-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    .sub-title {
+      color: #666;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+    
+    input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+    }
+    
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .btn-add {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px 25px;
+    }
+    
+    .btn-add:hover {
+      background-color: var(--secondary-color);
+    }
+    
+    .btn-edit {
+      background-color: #f39c12;
+      color: white;
+      padding: 8px 12px;
+    }
+    
+    .btn-edit:hover {
+      background-color: #d35400;
+    }
+    
+    .btn-delete {
+      background-color: var(--danger-color);
+      color: white;
+      padding: 8px 12px;
+    }
+    
+    .btn-delete:hover {
+      background-color: #c0392b;
+    }
+    
+    .user-list {
+      list-style-type: none;
+    }
+    
+    .user-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      margin-bottom: 10px;
+      background-color: #f9f9f9;
+      border-radius: var(--border-radius);
+      border-left: 4px solid var(--primary-color);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .user-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .user-photo {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      background-color: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 2px solid var(--primary-color);
+    }
+    
+    .user-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .user-name {
+      font-weight: 500;
+      font-size: 1.1rem;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 0;
+      color: #888;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #777;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--success-color);
+      color: white;
+      padding: 12px 25px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .toast.show {
+      opacity: 1;
+    }
+    
+    .toast.error {
+      background-color: var(--danger-color);
+    }
+    
+    .photo-input-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+    
+    .photo-preview {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 2px dashed #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .file-input-label {
+      display: inline-block;
+      background-color: #f2f2f2;
+      color: #333;
+      padding: 10px 15px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-align: center;
+      border: 1px solid #ddd;
+      transition: all 0.3s;
+    }
+    
+    .file-input-label:hover {
+      background-color: #e6e6e6;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background-color: white;
+      border-radius: var(--border-radius);
+      padding: 25px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: var(--shadow);
+    }
+    
+    .modal-header {
+      margin-bottom: 20px;
+    }
+    
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    .modal-body {
+      margin-bottom: 20px;
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    
+    .btn-cancel {
+      background-color: #f2f2f2;
+      color: #333;
+      padding: 10px 20px;
+    }
+    
+    .btn-cancel:hover {
+      background-color: #e6e6e6;
+    }
+    
+    .btn-save {
+      background-color: var(--success-color);
+      color: white;
+      padding: 10px 20px;
+    }
+    
+    .btn-save:hover {
+      background-color: #27ae60;
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px 15px;
+      }
+      
+      .input-group {
+        flex-direction: column;
+      }
+      
+      .btn-add {
+        width: 100%;
+      }
+      
+      .user-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      
+      .user-info {
+        width: 100%;
+      }
+      
+      .action-buttons {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Aplikasi Manajemen Pengguna</h1>
+      <p class="sub-title">Tambah, Edit, dan Hapus Data Pengguna</p>
+    </header>
+    
+    <div class="form-row">
+      <div class="photo-input-container">
+        <div class="photo-preview" id="photoPreview">
+          <img id="previewImage" src="/api/placeholder/100/100" alt="Preview" style="display: none;">
+        </div>
+        <label for="photoInput" class="file-input-label">Pilih Foto</label>
+        <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="previewPhoto(this)">
+      </div>
+      
+      <div class="input-group" style="flex: 1;">
+        <input type="text" id="nama" placeholder="Masukkan nama pengguna..." autocomplete="off" />
+        <button class="btn-add" onclick="addUser()">Tambah Pengguna</button>
+      </div>
+    </div>
+    
+    <div id="loading" class="loading">Memuat data...</div>
+    <ul id="userList" class="user-list"></ul>
+    <div id="emptyState" class="empty-state" style="display:none;">
+      <p>Belum ada data pengguna. Silakan tambahkan pengguna baru.</p>
+    </div>
+  </div>
+  
+  <!-- Modal Edit User -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Data Pengguna</h3>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="photo-input-container">
+            <div class="photo-preview" id="editPhotoPreview">
+              <img id="editPreviewImage" src="/api/placeholder/100/100" alt="Preview" style="display: none;">
+            </div>
+            <label for="editPhotoInput" class="file-input-label">Ubah Foto</label>
+            <input type="file" id="editPhotoInput" accept="image/*" style="display: none;" onchange="previewEditPhoto(this)">
+          </div>
+          
+          <div class="input-group" style="flex: 1;">
+            <input type="text" id="editNama" placeholder="Nama pengguna..." autocomplete="off" />
+            <input type="hidden" id="editId">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeEditModal()">Batal</button>
+        <button class="btn-save" onclick="saveEditUser()">Simpan</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const API_URL = 'http://localhost:3000/users';
+    let currentPhotoBase64 = null;
+    let editPhotoBase64 = null;
+    
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = isError ? 'toast error show' : 'toast show';
+      
+      setTimeout(() => {
+        toast.className = 'toast';
+      }, 3000);
+    }
+    
+    function previewPhoto(input) {
+      const preview = document.getElementById('previewImage');
+      
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          currentPhotoBase64 = e.target.result;
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+    
+    function previewEditPhoto(input) {
+      const preview = document.getElementById('editPreviewImage');
+      
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+          editPhotoBase64 = e.target.result;
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+    
+    function resetForm() {
+      document.getElementById('nama').value = '';
+      document.getElementById('previewImage').style.display = 'none';
+      document.getElementById('photoInput').value = '';
+      currentPhotoBase64 = null;
+    }
+    
+    async function getUsers() {
+      try {
+        document.getElementById('loading').style.display = 'block';
+        const res = await fetch(API_URL);
+        
+        if (!res.ok) {
+          throw new Error('Gagal memuat data');
+        }
+        
+        const users = await res.json();
+        const list = document.getElementById('userList');
+        const emptyState = document.getElementById('emptyState');
+        
+        list.innerHTML = '';
+        
+        if (users.length === 0) {
+          emptyState.style.display = 'block';
+        } else {
+          emptyState.style.display = 'none';
+          
+          users.forEach(user => {
+            const li = document.createElement('li');
+            li.className = 'user-item';
+            
+           const photoHTML = user.foto 
+  ? `<div class="user-photo"><img src="uploads/${user.foto}" alt="${user.nama}"></div>`
+  : `<div class="user-photo"><img src="/api/placeholder/50/50" alt="No Photo"></div>`;
+
+              
+            li.innerHTML = `
+              <div class="user-info">
+                ${photoHTML}
+                <span class="user-name">${user.nama}</span>
+              </div>
+              <div class="action-buttons">
+                <button class="btn-edit" onclick="showEditModal(${user.id}, '${user.nama}', '${user.foto || ''}')">Edit</button>
+                <button class="btn-delete" onclick="deleteUser(${user.id})">Hapus</button>
+              </div>
+            `;
+            list.appendChild(li);
+          });
+        }
+      } catch (error) {
+        showToast('Terjadi kesalahan: ' + error.message, true);
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    async function addUser() {
+  const namaInput = document.getElementById('nama');
+  const fileInput = document.getElementById('photoInput');
+  const nama = namaInput.value.trim();
+  const file = fileInput.files[0];
+
+  if (!nama) {
+    showToast('Nama tidak boleh kosong', true);
+    namaInput.focus();
+    return;
+  }
+
+  if (!file) {
+    showToast('Silakan pilih foto', true);
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('nama', nama);
+  formData.append('foto', file);
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!res.ok) {
+      throw new Error('Gagal menambahkan pengguna');
+    }
+
+    resetForm();
+    await getUsers();
+    showToast('Pengguna berhasil ditambahkan');
+  } catch (error) {
+    showToast('Terjadi kesalahan: ' + error.message, true);
+  }
+}
+
+
+    function showEditModal(id, nama, foto) {
+  const modal = document.getElementById('editModal');
+  const namaInput = document.getElementById('editNama');
+  const idInput = document.getElementById('editId');
+  const previewImage = document.getElementById('editPreviewImage');
+
+  namaInput.value = nama;
+  idInput.value = id;
+
+  if (foto && foto !== 'undefined') {
+    previewImage.src = 'uploads/' + foto;
+    previewImage.style.display = 'block';
+    editPhotoBase64 = foto;
+  } else {
+    previewImage.style.display = 'none';
+    editPhotoBase64 = null;
+  }
+
+  modal.style.display = 'flex';
+}
+
+    
+    function closeEditModal() {
+      const modal = document.getElementById('editModal');
+      modal.style.display = 'none';
+    }
+    
+    async function saveEditUser() {
+  const id = document.getElementById('editId').value;
+  const nama = document.getElementById('editNama').value.trim();
+  const fileInput = document.getElementById('editPhotoInput');
+  const file = fileInput.files[0]; // ambil file foto baru jika ada
+
+  if (!nama) {
+    showToast('Nama tidak boleh kosong', true);
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('nama', nama);
+  if (file) {
+    formData.append('foto', file);  // pastikan key 'foto' sesuai dengan backend
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: 'PUT',
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error('Gagal memperbarui data pengguna: ' + errText);
+    }
+
+    closeEditModal();
+    await getUsers();
+    showToast('Data pengguna berhasil diperbarui');
+  } catch (error) {
+    showToast('Terjadi kesalahan: ' + error.message, true);
+  }
+}
+
+
+    async function deleteUser(id) {
+      if (!confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) return;
+      
+      try {
+        const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+        
+        if (!res.ok) {
+          throw new Error('Gagal menghapus pengguna');
+        }
+        
+        await getUsers();
+        showToast('Pengguna berhasil dihapus');
+      } catch (error) {
+        showToast('Terjadi kesalahan: ' + error.message, true);
+      }
+    }
+    document.getElementById('nama').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        addUser();
+      }
+    });
+    
+    window.onclick = function(event) {
+      const modal = document.getElementById('editModal');
+      if (event.target === modal) {
+        closeEditModal();
+      }
+    };
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      getUsers();
+    });
+  </script>
+</body>
+</html>
